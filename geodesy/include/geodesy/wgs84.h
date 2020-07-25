@@ -39,6 +39,7 @@
 #define _WGS84_H_
 
 #include <limits>
+#include <cmath>
 #include <ctype.h>
 #include "geographic_msgs/msg/geo_point.hpp"
 #include "geographic_msgs/msg/geo_pose.hpp"
