@@ -34,10 +34,12 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include <sstream>
-#include <gtest/gtest.h>
 #include "geodesy/utm.h"
 
+#include <sstream>
+#include <string>
+
+#include <gtest/gtest.h>
 
 ///////////////////////////////////////////////////////////////
 // Utility functions
@@ -415,7 +417,6 @@ TEST(OStream, pose)
 
 TEST(ForceUTMZone, point)
 {
-
     geographic_msgs::msg::GeoPoint zone2, zone3;
     zone2.latitude=24.02;
     zone2 = geodesy::toMsg(24.02, 5.999);

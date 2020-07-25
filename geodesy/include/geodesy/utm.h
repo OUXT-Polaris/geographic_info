@@ -35,19 +35,20 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef _UTM_H_
-#define _UTM_H_
+#ifndef GEODESY__UTM_H_
+#define GEODESY__UTM_H_
 
 #include <limits>
-#include <ctype.h>
 #include <iostream>
 #include <iomanip>
 
-#include <geodesy/wgs84.h>
 #include "geographic_msgs/msg/geo_point.hpp"
 #include "geometry_msgs/msg/point.hpp"
 #include "geographic_msgs/msg/geo_pose.hpp"
 #include "geometry_msgs/msg/pose.hpp"
+
+#include <geodesy/wgs84.h>
+#include <ctype.h>
 
 /** @file
 
@@ -262,4 +263,4 @@ static inline geometry_msgs::msg::Pose toGeometry(const UTMPose &from)
 
 }  // namespace geodesy
 
-#endif // _UTM_H_
+#endif // GEODESY__UTM_H_

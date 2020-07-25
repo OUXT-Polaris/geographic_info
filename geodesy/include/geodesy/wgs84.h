@@ -35,12 +35,13 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef _WGS84_H_
-#define _WGS84_H_
+#ifndef GEODESY__WGS84_H_
+#define GEODESY__WGS84_H_
 
 #include <limits>
 #include <cmath>
 #include <ctype.h>
+#include <algorithm>
 #include "geographic_msgs/msg/geo_point.hpp"
 #include "geographic_msgs/msg/geo_pose.hpp"
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
@@ -240,4 +241,4 @@ namespace geodesy
 
 }  // namespace geodesy
 
-#endif // _WGS84_H_
+#endif // GEODESY__WGS84_H_

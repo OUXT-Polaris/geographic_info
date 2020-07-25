@@ -34,9 +34,9 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-//#include <exception>
-#include "angles/angles.h"
+// #include <exception>
 #include <geodesy/utm.h>
+#include "angles/angles.h"
 
 /**  @file
 
@@ -53,23 +53,22 @@
 
 namespace geodesy
 {
-
 // WGS84 Parameters
-#define WGS84_A		6378137.0		// major axis
-#define WGS84_B		6356752.31424518	// minor axis
-#define WGS84_F		0.0033528107		// ellipsoid flattening
-#define WGS84_E		0.0818191908		// first eccentricity
-#define WGS84_EP	0.0820944379		// second eccentricity
+#define WGS84_A   6378137.0        // major axis
+#define WGS84_B   6356752.31424518 // minor axis
+#define WGS84_F   0.0033528107     // ellipsoid flattening
+#define WGS84_E   0.0818191908     // first eccentricity
+#define WGS84_EP  0.0820944379     // second eccentricity
 
 // UTM Parameters
-#define UTM_K0		0.9996			// scale factor
-#define UTM_FE		500000.0		// false easting
-#define UTM_FN_N	0.0           // false northing, northern hemisphere
-#define UTM_FN_S	10000000.0    // false northing, southern hemisphere
-#define UTM_E2		(WGS84_E*WGS84_E)	// e^2
-#define UTM_E4		(UTM_E2*UTM_E2)		// e^4
-#define UTM_E6		(UTM_E4*UTM_E2)		// e^6
-#define UTM_EP2		(UTM_E2/(1-UTM_E2))	// e'^2
+#define UTM_K0    0.9996      // scale factor
+#define UTM_FE    500000.0    // false easting
+#define UTM_FN_N  0.0         // false northing, northern hemisphere
+#define UTM_FN_S  10000000.0  // false northing, southern hemisphere
+#define UTM_E2    (WGS84_E*WGS84_E)	  // e^2
+#define UTM_E4    (UTM_E2*UTM_E2)     // e^4
+#define UTM_E6    (UTM_E4*UTM_E2)     // e^6
+#define UTM_EP2   (UTM_E2/(1-UTM_E2)) // e'^2
 
 /**
  * Determine the correct UTM band letter for the given latitude.
@@ -117,7 +116,7 @@ static char UTMBand(double Lat, double Lon)
  */
 geographic_msgs::msg::GeoPoint toMsg(const UTMPoint &from)
 {
-  //remove 500,000 meter offset for longitude
+  // remove 500,000 meter offset for longitude
   double x = from.easting - 500000.0;
   double y = from.northing;
 
@@ -132,12 +131,12 @@ geographic_msgs::msg::GeoPoint toMsg(const UTMPoint &from)
 
   if ((from.band - 'N') < 0)
     {
-      //point is in southern hemisphere
-      //remove 10,000,000 meter offset used for southern hemisphere
+      // point is in southern hemisphere
+      // remove 10,000,000 meter offset used for southern hemisphere
       y -= 10000000.0;
     }
 
-  //+3 puts origin in middle of zone
+  // +3 puts origin in middle of zone
   LongOrigin = (from.zone - 1)*6 - 180 + 3;
   eccPrimeSquared = (eccSquared)/(1-eccSquared);
 
@@ -199,14 +198,14 @@ void fromMsg(const geographic_msgs::msg::GeoPoint &from, UTMPoint &to,
 
   // Make sure the longitude is between -180.00 .. 179.9
   // (JOQ: this is broken for Long < -180, do a real normalize)
-  double LongTemp = (Long+180)-int((Long+180)/360)*360-180;
+  double LongTemp = (Long+180)-static_cast<int>((Long+180)/360)*360-180;
   double LatRad = angles::from_degrees(Lat);
   double LongRad = angles::from_degrees(LongTemp);
   double LongOriginRad;
 
   to.altitude = from.altitude;
   if (!force_zone)
-    to.zone = int((LongTemp + 180)/6) + 1;
+    to.zone = static_cast<int>((LongTemp + 180)/6) + 1;
   else
     to.zone = zone;
 
@@ -253,19 +252,19 @@ void fromMsg(const geographic_msgs::msg::GeoPoint &from, UTMPoint &to,
             + 45*eccSquared*eccSquared*eccSquared/1024)*sin(4*LatRad)
          - (35*eccSquared*eccSquared*eccSquared/3072)*sin(6*LatRad));
 
-  to.easting = (double)
+  to.easting = static_cast<double>(
     (k0*N*(A+(1-T+C)*A*A*A/6
            + (5-18*T+T*T+72*C-58*eccPrimeSquared)*A*A*A*A*A/120)
-     + 500000.0);
+     + 500000.0));
 
-  to.northing = (double)
+  to.northing = static_cast<double>(
     (k0*(M+N*tan(LatRad)
          *(A*A/2+(5-T+9*C+4*C*C)*A*A*A*A/24
-           + (61-58*T+T*T+600*C-330*eccPrimeSquared)*A*A*A*A*A*A/720)));
+           + (61-58*T+T*T+600*C-330*eccPrimeSquared)*A*A*A*A*A*A/720))));
 
   if(Lat < 0)
     {
-      //10000000 meter offset for southern hemisphere
+      //  10000000 meter offset for southern hemisphere
       to.northing += 10000000.0;
     }
 }
@@ -322,4 +321,4 @@ bool isValid(const UTMPose &pose)
   return fabs(len2 - 1.0) <= TF_QUATERNION_TOLERANCE;
 }
 
-} // end namespace geodesy
+}  // namespace geodesy
