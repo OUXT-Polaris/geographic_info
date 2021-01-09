@@ -318,7 +318,7 @@ bool isValid(const UTMPose &pose)
                  + pose.orientation.y * pose.orientation.y
                  + pose.orientation.z * pose.orientation.z
                  + pose.orientation.w * pose.orientation.w);
-  return fabs(len2 - 1.0) <= TF_QUATERNION_TOLERANCE;
+  return std::fabs(len2 - 1.0) <= TF_QUATERNION_TOLERANCE;
 }
 
 }  // namespace geodesy

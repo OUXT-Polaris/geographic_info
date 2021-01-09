@@ -134,7 +134,7 @@ namespace geodesy
                    + pose.orientation.y * pose.orientation.y
                    + pose.orientation.z * pose.orientation.z
                    + pose.orientation.w * pose.orientation.w);
-    if (fabs(len2 - 1.0) > TF_QUATERNION_TOLERANCE)
+    if (std::fabs(len2 - 1.0) > TF_QUATERNION_TOLERANCE)
       return false;
 
     return isValid(pose.position);
