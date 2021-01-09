@@ -18,3 +18,4 @@ deps.gv
 lib/
 msg_gen/
 srv_gen/
+.vscode
