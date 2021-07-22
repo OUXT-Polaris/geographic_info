@@ -46,9 +46,10 @@
 ///////////////////////////////////////////////////////////////
 
 // check that two UTM points are near each other
-void check_utm_near(const geodesy::UTMPoint &pt1,
-                    const geodesy::UTMPoint &pt2,
-                    double abs_err)
+void check_utm_near(
+  const geodesy::UTMPoint & pt1,
+  const geodesy::UTMPoint & pt2,
+  double abs_err)
 {
   EXPECT_NEAR(pt1.easting, pt2.easting, abs_err);
   EXPECT_NEAR(pt1.northing, pt2.northing, abs_err);
@@ -179,11 +180,10 @@ TEST(UTMPoint, testZones)
   EXPECT_FALSE(geodesy::isValid(pt));
 
   // these should all work
-  for (uint8_t b = 1; b <= 60; ++b)
-    {
-      pt.zone = b;
-      EXPECT_TRUE(geodesy::isValid(pt));
-    }
+  for (uint8_t b = 1; b <= 60; ++b) {
+    pt.zone = b;
+    EXPECT_TRUE(geodesy::isValid(pt));
+  }
 }
 
 // Test band letters
@@ -310,18 +310,17 @@ TEST(UTMConvert, fromUtmToLatLongAndBack)
   char b = 'N';
 
   // try every possible zone of longitude
-  for (uint8_t z = 1; z <= 60; ++z)
-    {
-      geodesy::UTMPoint pt1(e, n, alt, z, b);
-      geographic_msgs::GeoPoint ll;
-      convert(pt1, ll);
-      geodesy::UTMPoint pt2;
-      convert(ll, pt2);
+  for (uint8_t z = 1; z <= 60; ++z) {
+    geodesy::UTMPoint pt1(e, n, alt, z, b);
+    geographic_msgs::GeoPoint ll;
+    convert(pt1, ll);
+    geodesy::UTMPoint pt2;
+    convert(ll, pt2);
 
-      EXPECT_TRUE(geodesy::isValid(pt1));
-      EXPECT_TRUE(geodesy::isValid(pt2));
-      check_utm_near(pt1, pt2, 0.000001);
-    }
+    EXPECT_TRUE(geodesy::isValid(pt1));
+    EXPECT_TRUE(geodesy::isValid(pt2));
+    check_utm_near(pt1, pt2, 0.000001);
+  }
 }
 
 // Test conversion from WGS 84 to UTM and back
@@ -332,24 +331,22 @@ TEST(UTMConvert, fromLatLongToUtmAndBack)
   // Try every possible degree of latitude and longitude. Avoid the
   // international date line. Even though the converted longitude is
   // close, it may end up less than -180 and hence inValid().
-  for (double lon = -179.5; lon < 180.0; lon += 1.0)
-    {
-      for (double lat = -80.0; lat <= 84.0; lat += 1.0)
-        {
-          geographic_msgs::GeoPoint pt1(geodesy::toMsg(lat, lon, alt));
-          EXPECT_TRUE(geodesy::isValid(pt1));
+  for (double lon = -179.5; lon < 180.0; lon += 1.0) {
+    for (double lat = -80.0; lat <= 84.0; lat += 1.0) {
+      geographic_msgs::GeoPoint pt1(geodesy::toMsg(lat, lon, alt));
+      EXPECT_TRUE(geodesy::isValid(pt1));
 
-          geodesy::UTMPoint utm(pt1);
-          EXPECT_TRUE(geodesy::isValid(utm));
+      geodesy::UTMPoint utm(pt1);
+      EXPECT_TRUE(geodesy::isValid(utm));
 
-          geographic_msgs::GeoPoint pt2(geodesy::toMsg(utm));
-          EXPECT_TRUE(geodesy::isValid(pt2));
+      geographic_msgs::GeoPoint pt2(geodesy::toMsg(utm));
+      EXPECT_TRUE(geodesy::isValid(pt2));
 
-          EXPECT_NEAR(pt1.latitude,  pt2.latitude,  0.0000001);
-          EXPECT_NEAR(pt1.longitude, pt2.longitude, 0.0000012);
-          EXPECT_NEAR(pt1.altitude,  pt2.altitude,  0.000001);
-        }
+      EXPECT_NEAR(pt1.latitude, pt2.latitude, 0.0000001);
+      EXPECT_NEAR(pt1.longitude, pt2.longitude, 0.0000012);
+      EXPECT_NEAR(pt1.altitude, pt2.altitude, 0.000001);
     }
+  }
 }
 
 // Test conversion from WGS 84 to UTM and back at international date line
@@ -358,28 +355,26 @@ TEST(UTMConvert, internationalDateLine)
   double alt = 100.0;
   double lon = -180.0;
 
-  for (double lat = -80.0; lat <= 84.0; lat += 1.0)
-    {
-      geographic_msgs::GeoPoint pt1(geodesy::toMsg(lat, lon, alt));
-      EXPECT_TRUE(geodesy::isValid(pt1));
+  for (double lat = -80.0; lat <= 84.0; lat += 1.0) {
+    geographic_msgs::GeoPoint pt1(geodesy::toMsg(lat, lon, alt));
+    EXPECT_TRUE(geodesy::isValid(pt1));
 
-      geodesy::UTMPoint utm;
-      geodesy::fromMsg(pt1, utm);
-      EXPECT_TRUE(geodesy::isValid(utm));
+    geodesy::UTMPoint utm;
+    geodesy::fromMsg(pt1, utm);
+    EXPECT_TRUE(geodesy::isValid(utm));
 
-      geographic_msgs::GeoPoint pt2(geodesy::toMsg(utm));
-      EXPECT_TRUE(geodesy::isValid(pt2));
-      EXPECT_NEAR(pt1.latitude,  pt2.latitude,  0.0000001);
-      EXPECT_NEAR(pt1.altitude,  pt2.altitude,  0.000001);
+    geographic_msgs::GeoPoint pt2(geodesy::toMsg(utm));
+    EXPECT_TRUE(geodesy::isValid(pt2));
+    EXPECT_NEAR(pt1.latitude, pt2.latitude, 0.0000001);
+    EXPECT_NEAR(pt1.altitude, pt2.altitude, 0.000001);
 
-      if (pt2.longitude - pt1.longitude > 359.0)
-        {
-          // pt2 seems to be slightly across the international date
-          // line from pt2, so de-normalize it
-          pt2.longitude -= 360.0;
-        }
-      EXPECT_NEAR(pt1.longitude, pt2.longitude, 0.0000012);
+    if (pt2.longitude - pt1.longitude > 359.0) {
+      // pt2 seems to be slightly across the international date
+      // line from pt2, so de-normalize it
+      pt2.longitude -= 360.0;
     }
+    EXPECT_NEAR(pt1.longitude, pt2.longitude, 0.0000012);
+  }
 }
 
 // Test point output stream operator
@@ -417,31 +412,31 @@ TEST(OStream, pose)
 
 TEST(ForceUTMZone, point)
 {
-    geographic_msgs::msg::GeoPoint zone2, zone3;
-    zone2.latitude=24.02;
-    zone2 = geodesy::toMsg(24.02, 5.999);
-    zone3 = geodesy::toMsg(24.02, 6.001);
-    geodesy::UTMPoint pt2, pt3, pt4;
-    geodesy::fromMsg(zone2, pt2);
-    geodesy::fromMsg(zone3, pt3);
+  geographic_msgs::msg::GeoPoint zone2, zone3;
+  zone2.latitude = 24.02;
+  zone2 = geodesy::toMsg(24.02, 5.999);
+  zone3 = geodesy::toMsg(24.02, 6.001);
+  geodesy::UTMPoint pt2, pt3, pt4;
+  geodesy::fromMsg(zone2, pt2);
+  geodesy::fromMsg(zone3, pt3);
 
-    EXPECT_FALSE(geodesy::sameGridZone(pt2, pt3) );
+  EXPECT_FALSE(geodesy::sameGridZone(pt2, pt3) );
 
-    double diffx = pt2.easting - pt3.easting;
-    double diffy = pt2.northing - pt3.northing;
-    double distance = std::sqrt(diffx*diffx + diffy*diffy);
+  double diffx = pt2.easting - pt3.easting;
+  double diffy = pt2.northing - pt3.northing;
+  double distance = std::sqrt(diffx * diffx + diffy * diffy);
 
-    //Now force the pt3 into pt2's grid zone
-    geodesy::fromMsg(zone3, pt4, true, pt2.band, pt2.zone);
-    diffx = pt2.easting - pt4.easting;
-    diffy = pt2.northing - pt4.northing;
-    double distance2 = std::sqrt(diffx*diffx + diffy*diffy);
-    ROS_INFO("Prev Distance %f, Actual Distance %f", distance, distance2);
-    EXPECT_LT(distance2, distance);
+  //Now force the pt3 into pt2's grid zone
+  geodesy::fromMsg(zone3, pt4, true, pt2.band, pt2.zone);
+  diffx = pt2.easting - pt4.easting;
+  diffy = pt2.northing - pt4.northing;
+  double distance2 = std::sqrt(diffx * diffx + diffy * diffy);
+  ROS_INFO("Prev Distance %f, Actual Distance %f", distance, distance2);
+  EXPECT_LT(distance2, distance);
 }
 
 // Run all the tests that were declared with TEST()
-int main(int argc, char **argv)
+int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
 
