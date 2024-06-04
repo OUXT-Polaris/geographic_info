@@ -35,7 +35,9 @@
 *********************************************************************/
 
 #include <gtest/gtest.h>
+
 #include <limits>
+
 #include "geodesy/wgs84.h"
 
 ///////////////////////////////////////////////////////////////
@@ -223,7 +225,6 @@ TEST(GeoPoint, normalize)
   check_normalize(-105, 0, -90, 0);
   check_normalize(-89.999999, 0, -89.999999, 0);
   check_normalize(-90.000001, 0, -90, 0);
-
 }
 
 // Test null pose constructor
@@ -241,14 +242,14 @@ TEST(GeoPose, quaternionValidity)
   geographic_msgs::GeoPose pose;
   EXPECT_FALSE(geodesy::isValid(pose));
 
-  pose.orientation.x = 1.0;             // identity quaternion
+  pose.orientation.x = 1.0;  // identity quaternion
   EXPECT_TRUE(geodesy::isValid(pose));
 
-  pose.orientation.x = 0.7071;          // also valid
+  pose.orientation.x = 0.7071;  // also valid
   pose.orientation.y = 0.7071;
   EXPECT_TRUE(geodesy::isValid(pose));
 
-  pose.orientation.x = 0.8071;          // not normalized
+  pose.orientation.x = 0.8071;  // not normalized
   pose.orientation.y = 0.8071;
   EXPECT_FALSE(geodesy::isValid(pose));
 }
@@ -280,7 +281,6 @@ TEST(Convert, GeoPoseToGeoPose)
   EXPECT_EQ(pose1.position.longitude, pose2.position.longitude);
   EXPECT_EQ(pose1.position.altitude, pose2.position.altitude);
 }
-
 
 // Run all the tests that were declared with TEST()
 int main(int argc, char ** argv)

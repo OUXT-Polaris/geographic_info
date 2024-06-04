@@ -34,22 +34,19 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include "geodesy/utm.h"
+#include <gtest/gtest.h>
 
 #include <sstream>
 #include <string>
 
-#include <gtest/gtest.h>
+#include "geodesy/utm.h"
 
 ///////////////////////////////////////////////////////////////
 // Utility functions
 ///////////////////////////////////////////////////////////////
 
 // check that two UTM points are near each other
-void check_utm_near(
-  const geodesy::UTMPoint & pt1,
-  const geodesy::UTMPoint & pt2,
-  double abs_err)
+void check_utm_near(const geodesy::UTMPoint & pt1, const geodesy::UTMPoint & pt2, double abs_err)
 {
   EXPECT_NEAR(pt1.easting, pt2.easting, abs_err);
   EXPECT_NEAR(pt1.northing, pt2.northing, abs_err);
@@ -168,7 +165,7 @@ TEST(UTMPoint, fromLatLong)
 TEST(UTMPoint, testZones)
 {
   geodesy::UTMPoint pt;
-  pt.band = 'X';                        // supply a valid band letter
+  pt.band = 'X';  // supply a valid band letter
 
   pt.zone = 0;
   EXPECT_FALSE(geodesy::isValid(pt));
@@ -190,7 +187,7 @@ TEST(UTMPoint, testZones)
 TEST(UTMPoint, testBands)
 {
   geodesy::UTMPoint pt;
-  pt.zone = 14;                         // supply a valid zone number
+  pt.zone = 14;  // supply a valid zone number
   EXPECT_FALSE(geodesy::isValid(pt));
 
   pt.band = '9';
@@ -235,7 +232,7 @@ TEST(UTMPose, pointQuaternionConstructor)
   char b = 'R';
   geodesy::UTMPoint pt(e, n, a, z, b);
 
-  geometry_msgs::Quaternion q;          // identity quaternion
+  geometry_msgs::Quaternion q;  // identity quaternion
   q.x = 1.0;
   q.y = 0.0;
   q.z = 0.0;
@@ -304,7 +301,7 @@ TEST(UTMPose, quaternionValidation)
 // Test conversion from UTM to WGS 84 and back
 TEST(UTMConvert, fromUtmToLatLongAndBack)
 {
-  double e = 500000.0;                  // central meridian of each zone
+  double e = 500000.0;  // central meridian of each zone
   double n = 1000.0;
   double alt = 100.0;
   char b = 'N';
@@ -420,7 +417,7 @@ TEST(ForceUTMZone, point)
   geodesy::fromMsg(zone2, pt2);
   geodesy::fromMsg(zone3, pt3);
 
-  EXPECT_FALSE(geodesy::sameGridZone(pt2, pt3) );
+  EXPECT_FALSE(geodesy::sameGridZone(pt2, pt3));
 
   double diffx = pt2.easting - pt3.easting;
   double diffy = pt2.northing - pt3.northing;

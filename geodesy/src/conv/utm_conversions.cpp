@@ -36,6 +36,7 @@
 
 // #include <exception>
 #include <geodesy/utm.h>
+
 #include "angles/angles.h"
 
 /**  @file
@@ -54,21 +55,21 @@
 namespace geodesy
 {
 // WGS84 Parameters
-#define WGS84_A   6378137.0        // major axis
-#define WGS84_B   6356752.31424518 // minor axis
-#define WGS84_F   0.0033528107     // ellipsoid flattening
-#define WGS84_E   0.0818191908     // first eccentricity
-#define WGS84_EP  0.0820944379     // second eccentricity
+#define WGS84_A 6378137.0         // major axis
+#define WGS84_B 6356752.31424518  // minor axis
+#define WGS84_F 0.0033528107      // ellipsoid flattening
+#define WGS84_E 0.0818191908      // first eccentricity
+#define WGS84_EP 0.0820944379     // second eccentricity
 
 // UTM Parameters
-#define UTM_K0    0.9996      // scale factor
-#define UTM_FE    500000.0    // false easting
-#define UTM_FN_N  0.0         // false northing, northern hemisphere
-#define UTM_FN_S  10000000.0  // false northing, southern hemisphere
-#define UTM_E2    (WGS84_E * WGS84_E)       // e^2
-#define UTM_E4    (UTM_E2 * UTM_E2)     // e^4
-#define UTM_E6    (UTM_E4 * UTM_E2)     // e^6
-#define UTM_EP2   (UTM_E2 / (1 - UTM_E2)) // e'^2
+#define UTM_K0 0.9996                    // scale factor
+#define UTM_FE 500000.0                  // false easting
+#define UTM_FN_N 0.0                     // false northing, northern hemisphere
+#define UTM_FN_S 10000000.0              // false northing, southern hemisphere
+#define UTM_E2 (WGS84_E * WGS84_E)       // e^2
+#define UTM_E4 (UTM_E2 * UTM_E2)         // e^4
+#define UTM_E6 (UTM_E4 * UTM_E2)         // e^6
+#define UTM_EP2 (UTM_E2 / (1 - UTM_E2))  // e'^2
 
 /**
  * Determine the correct UTM band letter for the given latitude.
@@ -81,7 +82,9 @@ static char UTMBand(double Lat, double Lon)
   char LetterDesignator;
   (void)Lon;
 
-  if ((84 >= Lat) && (Lat >= 72)) {LetterDesignator = 'X';} else if ((72 > Lat) && (Lat >= 64)) {
+  if ((84 >= Lat) && (Lat >= 72)) {
+    LetterDesignator = 'X';
+  } else if ((72 > Lat) && (Lat >= 64)) {
     LetterDesignator = 'W';
   } else if ((64 > Lat) && (Lat >= 56)) {
     LetterDesignator = 'V';
@@ -97,9 +100,9 @@ static char UTMBand(double Lat, double Lon)
     LetterDesignator = 'Q';
   } else if ((16 > Lat) && (Lat >= 8)) {
     LetterDesignator = 'P';
-  } else if (( 8 > Lat) && (Lat >= 0)) {
+  } else if ((8 > Lat) && (Lat >= 0)) {
     LetterDesignator = 'N';
-  } else if (( 0 > Lat) && (Lat >= -8)) {
+  } else if ((0 > Lat) && (Lat >= -8)) {
     LetterDesignator = 'M';
   } else if ((-8 > Lat) && (Lat >= -16)) {
     LetterDesignator = 'L';
@@ -117,9 +120,13 @@ static char UTMBand(double Lat, double Lon)
     LetterDesignator = 'E';
   } else if ((-64 > Lat) && (Lat >= -72)) {
     LetterDesignator = 'D';
-  } else if ((-72 > Lat) && (Lat >= -80)) {LetterDesignator = 'C';}
+  } else if ((-72 > Lat) && (Lat >= -80)) {
+    LetterDesignator = 'C';
+  }
   // '_' is an error flag, the Latitude is outside the UTM limits
-  else {LetterDesignator = ' ';}
+  else {
+    LetterDesignator = ' ';
+  }
 
   return LetterDesignator;
 }
@@ -158,11 +165,11 @@ geographic_msgs::msg::GeoPoint toMsg(const UTMPoint & from)
 
   M = y / k0;
   mu = M / (a * (1 - eccSquared / 4 - 3 * eccSquared * eccSquared / 64 -
-    5 * eccSquared * eccSquared * eccSquared / 256));
+                 5 * eccSquared * eccSquared * eccSquared / 256));
 
   phi1Rad = mu + ((3 * e1 / 2 - 27 * e1 * e1 * e1 / 32) * sin(2 * mu) +
-    (21 * e1 * e1 / 16 - 55 * e1 * e1 * e1 * e1 / 32) * sin(4 * mu) +
-    (151 * e1 * e1 * e1 / 96) * sin(6 * mu));
+                  (21 * e1 * e1 / 16 - 55 * e1 * e1 * e1 * e1 / 32) * sin(4 * mu) +
+                  (151 * e1 * e1 * e1 / 96) * sin(6 * mu));
 
   N1 = a / sqrt(1 - eccSquared * sin(phi1Rad) * sin(phi1Rad));
   T1 = tan(phi1Rad) * tan(phi1Rad);
@@ -174,16 +181,17 @@ geographic_msgs::msg::GeoPoint toMsg(const UTMPoint & from)
   geographic_msgs::msg::GeoPoint to;
   to.altitude = from.altitude;
   to.latitude =
-    phi1Rad - ((N1 * tan(phi1Rad) / R1) *
-    (D * D / 2 -
-    (5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * eccPrimeSquared) * D * D * D * D / 24 +
-    (61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * eccPrimeSquared -
-    3 * C1 * C1) * D * D * D * D * D * D / 720));
+    phi1Rad -
+    ((N1 * tan(phi1Rad) / R1) *
+     (D * D / 2 - (5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * eccPrimeSquared) * D * D * D * D / 24 +
+      (61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * eccPrimeSquared - 3 * C1 * C1) * D * D * D *
+        D * D * D / 720));
   to.latitude = angles::to_degrees(to.latitude);
-  to.longitude = ((D - (1 + 2 * T1 + C1) * D * D * D / 6 +
-    (5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * eccPrimeSquared + 24 * T1 * T1) *
-    D * D * D * D * D / 120) /
-    cos(phi1Rad));
+  to.longitude =
+    ((D - (1 + 2 * T1 + C1) * D * D * D / 6 +
+      (5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * eccPrimeSquared + 24 * T1 * T1) * D * D * D * D *
+        D / 120) /
+     cos(phi1Rad));
   to.longitude = LongOrigin + angles::to_degrees(to.longitude);
 
   // Normalize latitude and longitude to valid ranges.
@@ -199,8 +207,8 @@ geographic_msgs::msg::GeoPoint toMsg(const UTMPoint & from)
  *  @param to UTM point.
  */
 void fromMsg(
-  const geographic_msgs::msg::GeoPoint & from, UTMPoint & to,
-  const bool & force_zone, const char & band, const uint8_t & zone)
+  const geographic_msgs::msg::GeoPoint & from, UTMPoint & to, const bool & force_zone,
+  const char & band, const uint8_t & zone)
 {
   double Lat = from.latitude;
   double Long = from.longitude;
@@ -239,7 +247,9 @@ void fromMsg(
       to.zone = 33;
     } else if (LongTemp >= 21.0 && LongTemp < 33.0) {
       to.zone = 35;
-    } else if (LongTemp >= 33.0 && LongTemp < 42.0) {to.zone = 37;}
+    } else if (LongTemp >= 33.0 && LongTemp < 42.0) {
+      to.zone = 37;
+    }
   }
   // +3 puts origin in middle of zone
   LongOrigin = (to.zone - 1) * 6 - 180 + 3;
@@ -251,7 +261,6 @@ void fromMsg(
   } else {
     to.band = band;
   }
-
 
 #if 0
   if (to.band == ' ') {
@@ -267,22 +276,26 @@ void fromMsg(
   A = cos(LatRad) * (LongRad - LongOriginRad);
 
   M = a * ((1 - eccSquared / 4 - 3 * eccSquared * eccSquared / 64 -
-    5 * eccSquared * eccSquared * eccSquared / 256) * LatRad -
-    (3 * eccSquared / 8 + 3 * eccSquared * eccSquared / 32 +
-    45 * eccSquared * eccSquared * eccSquared / 1024) * sin(2 * LatRad) +
-    (15 * eccSquared * eccSquared / 256 +
-    45 * eccSquared * eccSquared * eccSquared / 1024) * sin(4 * LatRad) -
-    (35 * eccSquared * eccSquared * eccSquared / 3072) * sin(6 * LatRad));
+            5 * eccSquared * eccSquared * eccSquared / 256) *
+             LatRad -
+           (3 * eccSquared / 8 + 3 * eccSquared * eccSquared / 32 +
+            45 * eccSquared * eccSquared * eccSquared / 1024) *
+             sin(2 * LatRad) +
+           (15 * eccSquared * eccSquared / 256 + 45 * eccSquared * eccSquared * eccSquared / 1024) *
+             sin(4 * LatRad) -
+           (35 * eccSquared * eccSquared * eccSquared / 3072) * sin(6 * LatRad));
 
   to.easting = static_cast<double>(
-    (k0 * N * (A + (1 - T + C) * A * A * A / 6 +
-    (5 - 18 * T + T * T + 72 * C - 58 * eccPrimeSquared) * A * A * A * A * A / 120) +
-    500000.0));
+    (k0 * N *
+       (A + (1 - T + C) * A * A * A / 6 +
+        (5 - 18 * T + T * T + 72 * C - 58 * eccPrimeSquared) * A * A * A * A * A / 120) +
+     500000.0));
 
   to.northing = static_cast<double>(
     (k0 * (M + N * tan(LatRad) *
-    (A * A / 2 + (5 - T + 9 * C + 4 * C * C) * A * A * A * A / 24 +
-    (61 - 58 * T + T * T + 600 * C - 330 * eccPrimeSquared) * A * A * A * A * A * A / 720))));
+                 (A * A / 2 + (5 - T + 9 * C + 4 * C * C) * A * A * A * A / 24 +
+                  (61 - 58 * T + T * T + 600 * C - 330 * eccPrimeSquared) * A * A * A * A * A * A /
+                    720))));
 
   if (Lat < 0) {
     //  10000000 meter offset for southern hemisphere
@@ -312,10 +325,7 @@ bool isValid(const UTMPoint & pt)
 }
 
 /** Create UTM point from WGS 84 geodetic point. */
-UTMPoint::UTMPoint(const geographic_msgs::msg::GeoPoint & pt)
-{
-  fromMsg(pt, *this);
-}
+UTMPoint::UTMPoint(const geographic_msgs::msg::GeoPoint & pt) { fromMsg(pt, *this); }
 
 /** Convert WGS 84 geodetic pose to UTM pose.
  *
@@ -325,8 +335,8 @@ UTMPoint::UTMPoint(const geographic_msgs::msg::GeoPoint & pt)
  *  @todo define the orientation transformation properly
  */
 void fromMsg(
-  const geographic_msgs::msg::GeoPose & from, UTMPose & to,
-  const bool & force_zone, const char & band, const uint8_t & zone)
+  const geographic_msgs::msg::GeoPose & from, UTMPose & to, const bool & force_zone,
+  const char & band, const uint8_t & zone)
 {
   fromMsg(from.position, to.position, force_zone, band, zone);
   to.orientation = from.orientation;
@@ -340,10 +350,9 @@ bool isValid(const UTMPose & pose)
   }
 
   // check that orientation quaternion is normalized
-  double len2 = (pose.orientation.x * pose.orientation.x +
-    pose.orientation.y * pose.orientation.y +
-    pose.orientation.z * pose.orientation.z +
-    pose.orientation.w * pose.orientation.w);
+  double len2 =
+    (pose.orientation.x * pose.orientation.x + pose.orientation.y * pose.orientation.y +
+     pose.orientation.z * pose.orientation.z + pose.orientation.w * pose.orientation.w);
   return std::fabs(len2 - 1.0) <= TF_QUATERNION_TOLERANCE;
 }
 
